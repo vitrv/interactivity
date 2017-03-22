@@ -12,6 +12,10 @@ void create_floor(std::vector<glm::vec4>& floor_vertices, std::vector<glm::uvec3
 	floor_faces.push_back(glm::uvec3(2, 3, 0));
 }
 
+void create_skeleton(std::vector<glm::vec4>& skel_vertices){
+
+}
+
 // FIXME: create cylinders and lines for the bones
 // Hints: Generate a lattice in [-0.5, 0, 0] x [0.5, 1, 0] We wrap this
 // around in the vertex shader to produce a very smooth cylinder.  We only

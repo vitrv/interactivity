@@ -37,10 +37,14 @@ struct Bone {
 
 struct Skeleton {
 	// FIXME: create skeleton and bone data structures
-	Bone bone;
-	Bone parent;
+	/*Bone bone;
+	Skeleton parent;
+	std::vector<Skeleton*> children;
 	glm::vec3 originpos;
-    glm::vec3 endpos;
+    glm::vec3 endpos;*/
+
+    Bone* root;
+    std::vector<Bone> bones;
     
 };
 

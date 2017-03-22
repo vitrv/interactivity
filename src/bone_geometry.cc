@@ -48,9 +48,13 @@ void Mesh::loadpmd(const std::string& fn)
     glm::vec3 offset;
     int parentid;
 
-    while(mr.getJoint(bones, offset, parentid)){
+    while(mr.getJoint(boneid, offset, parentid)){
+
        boneid++;
-    } 
+    }
+
+    //Load in a garbage bone
+
 
     printf("Total bones: %i\n", boneid );
 	// FIXME: load skeleton and blend weights from PMD file
