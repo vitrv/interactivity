@@ -43,22 +43,56 @@ void Mesh::loadpmd(const std::string& fn)
 	mr.getMesh(vertices, faces, vertex_normals, uv_coordinates);
 	computeBounds();
 	mr.getMaterial(materials);
+	Skeleton sktModel;
 
-    int boneid = 0;
-    glm::vec3 offset;
-    int parentid;
+	sktModel.num_Bones = 0;
+	int boneID, parentId;
+	glm::vec3 offset;
+	boneID =0;
+	while(mr.getJoint(boneID, offset, parentId)){
 
-    while(mr.getJoint(boneid, offset, parentid)){
+		Joint tempJoint;
+		tempJoint.ID = boneID;
+		tempJoint.offset = offset;
+		tempJoint.parentID = parentId;
+		sktModel.joints.push_back(tempJoint);
+		boneID++;
+	}
 
-       boneid++;
-    }
+	// Form the bone
+	Bone bone;
+	bool isParent = false;
+	std::map<int,Joint> m;
+	int numLoop =0;
+	for (std::vector<Joint>::iterator it = sktModel.joints.begin() ; it != sktModel.joints.end(); ++it){
+		Joint temp = *it;
+		if(temp.parentID == -1){
+			isParent = true;
+		}
+		if(m.find(temp.parentID) != m.end() ){
+			
+			//We got second joint, time to make a bone
+			bone.end = *it;
+			bone.origin = m.at(temp.parentID);
+			sktModel.bones.push_back(bone);
+			sktModel.num_Bones++;
+			if(isParent){
+				sktModel.root = bone;
+				isParent = false;
+			}
+			Bone fresh;
+			bone = fresh;
 
-    //Load in a garbage bone
-
-
-    printf("Total bones: %i\n", boneid );
+		}else
+		{
+			m.insert(std::make_pair(temp.ID, temp));
+		}
+		
+	}
+	
 	// FIXME: load skeleton and blend weights from PMD file
 	//        also initialize the skeleton as needed
+
 }
 
 void Mesh::updateAnimation()
