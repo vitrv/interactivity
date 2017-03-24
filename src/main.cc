@@ -38,6 +38,10 @@ const char* floor_fragment_shader =
 #include "shaders/floor.frag"
 ;
 
+const char* bone_fragment_shader =
+#include "shaders/bone.frag"
+;
+
 // FIXME: Add more shaders here.
 
 void ErrorCallback(int error, const char* description) {
@@ -84,6 +88,15 @@ int main(int argc, char* argv[])
 	create_floor(floor_vertices, floor_faces);
 
 	// FIXME: add code to create bone and cylinder geometry
+
+	std::vector<glm::vec4> skel_vertices;
+	std::vector<glm::uvec3> skel_lines;
+
+	skel_vertices.push_back(glm::vec4(0.0,0.0,0.0,0.0));
+	skel_vertices.push_back(glm::vec4(0.0,0.5,0.0,1.0));
+	skel_vertices.push_back(glm::vec4(0.0,-0.5,0.0,1.0));
+	skel_vertices.push_back(glm::vec4(0.0,0.0,3.0,1.0));
+	skel_lines.push_back(glm::uvec3(0,1,2));
 
 	Mesh mesh;
 	mesh.loadpmd(argv[1]);
@@ -190,6 +203,16 @@ int main(int argc, char* argv[])
 
 	// FIXME: Create the RenderPass objects for bones here.
 	//        Otherwise do whatever you like.
+    RenderDataInput bone_pass_input;
+	bone_pass_input.assign(0, "vertex_position", skel_vertices.data(), skel_vertices.size(), 4, GL_FLOAT);
+	bone_pass_input.assign_index(skel_lines.data(), skel_lines.size(), 3);
+    RenderPass bone_pass(-1,
+			bone_pass_input,
+			{ vertex_shader, geometry_shader, bone_fragment_shader},
+			{ std_model, std_view, std_proj, std_light },
+			{ "fragment_color" }
+			); 
+
 
 	RenderDataInput floor_pass_input;
 	floor_pass_input.assign(0, "vertex_position", floor_vertices.data(), floor_vertices.size(), 4, GL_FLOAT);
@@ -208,7 +231,11 @@ int main(int argc, char* argv[])
 	bool draw_object = true;
 	bool draw_cylinder = true;
 
+
+
 	while (!glfwWindowShouldClose(window)) {
+
+       
 		// Setup some basic window stuff.
 		glfwGetFramebufferSize(window, &window_width, &window_height);
 		glViewport(0, 0, window_width, window_height);
@@ -232,6 +259,9 @@ int main(int argc, char* argv[])
 		draw_cylinder = true;
 #endif
 		// FIXME: Draw bones first.
+		bone_pass.setup();
+		CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0));
+
 		// Then draw floor.
 		if (draw_floor) {
 			floor_pass.setup();
