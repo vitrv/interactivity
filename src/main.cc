@@ -42,6 +42,14 @@ const char* bone_fragment_shader =
 #include "shaders/bone.frag"
 ;
 
+const char* bone_vertex_shader =
+#include "shaders/bone.vert"
+;
+
+const char* bone_geometry_shader =
+#include "shaders/bone.geom"
+;
+
 // FIXME: Add more shaders here.
 
 void ErrorCallback(int error, const char* description) {
@@ -90,13 +98,11 @@ int main(int argc, char* argv[])
 	// FIXME: add code to create bone and cylinder geometry
 
 	std::vector<glm::vec4> skel_vertices;
-	std::vector<glm::uvec3> skel_lines;
+	std::vector<glm::uvec2> skel_lines;
 
-	skel_vertices.push_back(glm::vec4(0.0,0.0,0.0,0.0));
-	skel_vertices.push_back(glm::vec4(0.0,0.5,0.0,1.0));
-	skel_vertices.push_back(glm::vec4(0.0,-0.5,0.0,1.0));
-	skel_vertices.push_back(glm::vec4(0.0,0.0,3.0,1.0));
-	skel_lines.push_back(glm::uvec3(0,1,2));
+	skel_vertices.push_back(glm::vec4(0.0,0.0,0.0,1.0));
+	skel_vertices.push_back(glm::vec4(0.0,5.0,0.0,1.0));
+	skel_lines.push_back(glm::uvec2(0,1));
 
 	Mesh mesh;
 	mesh.loadpmd(argv[1]);
@@ -205,11 +211,11 @@ int main(int argc, char* argv[])
 	//        Otherwise do whatever you like.
     RenderDataInput bone_pass_input;
 	bone_pass_input.assign(0, "vertex_position", skel_vertices.data(), skel_vertices.size(), 4, GL_FLOAT);
-	bone_pass_input.assign_index(skel_lines.data(), skel_lines.size(), 3);
+	bone_pass_input.assign_index(skel_lines.data(), skel_lines.size(), 2);
     RenderPass bone_pass(-1,
 			bone_pass_input,
-			{ vertex_shader, geometry_shader, bone_fragment_shader},
-			{ std_model, std_view, std_proj, std_light },
+			{ bone_vertex_shader, bone_geometry_shader, bone_fragment_shader},
+			{ std_model, std_view, std_proj},
 			{ "fragment_color" }
 			); 
 
@@ -260,7 +266,7 @@ int main(int argc, char* argv[])
 #endif
 		// FIXME: Draw bones first.
 		bone_pass.setup();
-		CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0));
+		CHECK_GL_ERROR(glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, 0));
 
 		// Then draw floor.
 		if (draw_floor) {
