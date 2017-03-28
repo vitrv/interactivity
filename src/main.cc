@@ -100,10 +100,6 @@ int main(int argc, char* argv[])
 	std::vector<glm::vec4> skel_vertices;
 	std::vector<glm::uvec2> skel_lines;
 
-	skel_vertices.push_back(glm::vec4(0.0,0.0,0.0,1.0));
-	skel_vertices.push_back(glm::vec4(0.0,5.0,0.0,1.0));
-	skel_lines.push_back(glm::uvec2(0,1));
-
 	Mesh mesh;
 	mesh.loadpmd(argv[1]);
 	std::cout << "Loaded object  with  " << mesh.vertices.size()
@@ -119,6 +115,8 @@ int main(int argc, char* argv[])
 	 * GUI object needs the mesh object for bone manipulation.
 	 */
 	gui.assignMesh(&mesh);
+
+	create_skeleton(mesh.skeleton, skel_vertices, skel_lines);
 
 	glm::vec4 light_position = glm::vec4(0.0f, 100.0f, 0.0f, 1.0f);
 	MatrixPointers mats; // Define MatrixPointers here for lambda to capture

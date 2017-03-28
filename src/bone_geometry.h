@@ -33,6 +33,7 @@ struct Joint {
 struct Bone {
 	Joint origin;
 	Joint end;
+	std::vector<int> children;
 	double length;
 	glm::vec3 tangentDir;
 	glm::vec3 normalDir;
@@ -45,7 +46,7 @@ struct Bone {
 };
 
 struct Skeleton {
-	Bone root;
+	Bone root; // ???
 	std::vector<Joint> joints;
 	std::vector<Bone> bones;
 	int num_Bones;

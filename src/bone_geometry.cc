@@ -87,6 +87,24 @@ void Mesh::loadpmd(const std::string& fn)
 		{
 			m.insert(std::make_pair(temp.ID, temp));
 		}
+
+    }
+    
+
+    //Find children
+	for (std::vector<Bone>::iterator it = sktModel.bones.begin(); 
+	     it != sktModel.bones.end(); ++it){
+         
+         Bone bone = *it;
+        for (std::vector<Bone>::iterator iz = sktModel.bones.begin(); 
+	        iz != sktModel.bones.end(); ++iz){
+            Bone bone2 = *iz;
+
+            if(bone.end.ID == bone2.origin.ID)
+            	//bone.children.push_back(&bone2);
+      
+		
+	    }
 		
 	}
 	

@@ -24,3 +24,13 @@ void find_bone_directions(Skeleton bob){
 		
 	}
 }
+
+void create_skeleton(Skeleton skel, std::vector<glm::vec4>& skel_vertices, 
+	                 std::vector<glm::uvec2>& skel_lines ){
+
+    glm::vec3 base_offset = skel.joints[0].offset;
+
+    skel_vertices.push_back(glm::vec4(0.0,0.0,0.0,1.0));
+	skel_vertices.push_back(glm::vec4(0.0,5.0,0.0,1.0));
+	skel_lines.push_back(glm::uvec2(0,1));
+}
