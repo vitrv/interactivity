@@ -43,73 +43,51 @@ void Mesh::loadpmd(const std::string& fn)
 	mr.getMesh(vertices, faces, vertex_normals, uv_coordinates);
 	computeBounds();
 	mr.getMaterial(materials);
-	Skeleton sktModel;
-
-	sktModel.num_Bones = 0;
-	int boneID, parentId;
+	
+	//Skeleton skel_model;
+	//skel_model.total_bones = 0;
+	int jointID, parentID;
 	glm::vec3 offset;
-	boneID =0;
-	while(mr.getJoint(boneID, offset, parentId)){
+	jointID = 0;
 
-		Joint tempJoint;
-		tempJoint.ID = boneID;
-		tempJoint.offset = offset;
-		tempJoint.parentID = parentId;
-		sktModel.joints.push_back(tempJoint);
-		boneID++;
-	}
+	std::map<int,Joint*> joint_map;
 
-	// Form the bone
-	Bone bone;
-	bool isParent = false;
-	std::map<int,Joint> m;
-	int numLoop =0;
-	for (std::vector<Joint>::iterator it = sktModel.joints.begin() ; it != sktModel.joints.end(); ++it){
-		Joint temp = *it;
-		if(temp.parentID == -1){
-			isParent = true;
+	std::vector<Joint*> joint_list;
+
+    while(mr.getJoint(jointID, offset, parentID)){
+
+        Joint* joint = new Joint(jointID, offset, parentID);
+        skeleton.joints.push_back(joint);
+        joint_list.push_back(joint);
+        joint_map.insert(std::make_pair(jointID, joint));
+        
+        jointID+= 1;
+    }
+
+    skeleton.total_bones = 0;
+    for (std::vector<Joint*>::iterator it = joint_list.begin();
+         it != joint_list.end(); ++it){
+		
+		Joint* joint = *it;
+
+ 
+	    if(joint->parentID == -1){
+			skeleton.root = joint;
 		}
-		if(m.find(temp.parentID) != m.end() ){
-			
-			//We got second joint, time to make a bone
-			bone.end = *it;
-			bone.origin = m.at(temp.parentID);
-			sktModel.bones.push_back(bone);
-			sktModel.num_Bones++;
-			if(isParent){
-				sktModel.root = bone;
-				isParent = false;
-			}
-			Bone fresh;
-			bone = fresh;
+	    else if (joint_map.find(joint->parentID) != joint_map.end()){
 
-		}else
-		{
-			m.insert(std::make_pair(temp.ID, temp));
-		}
+            Joint* parent = joint_map.at(joint->parentID);
+
+	    	Bone* bone = new Bone(joint, parent);
+
+	    	skeleton.bones.push_back(bone);
+	    	parent->children.push_back(bone);
+	    	skeleton.total_bones++;
+
+	    }
 
     }
-    
-
-    //Find children
-	for (std::vector<Bone>::iterator it = sktModel.bones.begin(); 
-	     it != sktModel.bones.end(); ++it){
-         
-         Bone bone = *it;
-        for (std::vector<Bone>::iterator iz = sktModel.bones.begin(); 
-	        iz != sktModel.bones.end(); ++iz){
-            Bone bone2 = *iz;
-
-            if(bone.end.ID == bone2.origin.ID)
-            	//bone.children.push_back(&bone2);
-      
-		
-	    }
-		
-	}
-	
-	// FIXME: load skeleton and blend weights from PMD file
-	//        also initialize the skeleton as needed
+    printf("lvl 1 children: %d\n", skeleton.root->children.size() );
 
 }
 

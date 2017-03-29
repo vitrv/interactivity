@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
 	 */
 	gui.assignMesh(&mesh);
 
-	create_skeleton(mesh.skeleton, skel_vertices, skel_lines);
+	create_skeleton(mesh.skeleton.root, skel_vertices, skel_lines);
 
 	glm::vec4 light_position = glm::vec4(0.0f, 100.0f, 0.0f, 1.0f);
 	MatrixPointers mats; // Define MatrixPointers here for lambda to capture
@@ -264,7 +264,7 @@ int main(int argc, char* argv[])
 #endif
 		// FIXME: Draw bones first.
 		bone_pass.setup();
-		CHECK_GL_ERROR(glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, 0));
+		CHECK_GL_ERROR(glDrawElements(GL_LINES, skel_lines.size() * 2, GL_UNSIGNED_INT, 0));
 
 		// Then draw floor.
 		if (draw_floor) {

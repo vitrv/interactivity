@@ -1,2 +1,2 @@
 #!/bin/bash          
-./build/bin/skinning assets/pmd/Meiko_Sakine.pmd
+./build/bin/skinning assets/pmd/Rin_Kagamine.pmd

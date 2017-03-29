@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <math.h>
 
+
+int bone_index = 0;
+
 void create_floor(std::vector<glm::vec4>& floor_vertices, std::vector<glm::uvec3>& floor_faces)
 {
 	floor_vertices.push_back(glm::vec4(kFloorXMin, kFloorY, kFloorZMax, 1.0f));
@@ -19,18 +22,53 @@ void create_floor(std::vector<glm::vec4>& floor_vertices, std::vector<glm::uvec3
 // need to send a small number of points.  Controlling the grid size gives a
 // nice wireframe.
 void find_bone_directions(Skeleton bob){
-	for (std::vector<Bone>::iterator it = bob.bones.begin() ; it != bob.bones.end(); ++it){
-		Bone temp = *it;
+	//for (std::vector<Bone>::iterator it = bob.bones.begin() ; it != bob.bones.end(); ++it){
+	//	Bone temp = *it;
 		
-	}
+	//}
 }
 
-void create_skeleton(Skeleton skel, std::vector<glm::vec4>& skel_vertices, 
+void create_skeleton(Joint* root, std::vector<glm::vec4>& skel_vertices, 
 	                 std::vector<glm::uvec2>& skel_lines ){
 
-    glm::vec3 base_offset = skel.joints[0].offset;
+   
 
-    skel_vertices.push_back(glm::vec4(0.0,0.0,0.0,1.0));
-	skel_vertices.push_back(glm::vec4(0.0,5.0,0.0,1.0));
-	skel_lines.push_back(glm::uvec2(0,1));
+    for (std::vector<Bone*>::iterator it = root->children.begin();
+        it != root->children.end(); ++it){
+
+    	Bone* child = *it;
+
+        glm::vec3 a = root->offset;
+        glm::vec3 o = child->end->offset;
+        glm::vec3 b = a + child->end->offset;
+        
+        skel_vertices.push_back(glm::vec4(a.x, a.y, a.z, 1.0));
+        skel_vertices.push_back(glm::vec4(b.x, b.y, b.z, 1.0));
+        skel_lines.push_back(glm::uvec2(bone_index++,bone_index++));
+
+    	create_skeleton_t(child->end, b, skel_vertices, skel_lines);
+    }	
 }
+
+void create_skeleton_t(Joint* root, glm::vec3 base_offset, 
+	                 std::vector<glm::vec4>& skel_vertices, 
+	                 std::vector<glm::uvec2>& skel_lines) {
+
+        for (std::vector<Bone*>::iterator it = root->children.begin();
+        it != root->children.end(); ++it){
+
+	    	Bone* child = *it;
+
+	        glm::vec3 a = base_offset;
+	        glm::vec3 o = child->end->offset;
+	        glm::vec3 b = a + child->end->offset;
+	        
+	        skel_vertices.push_back(glm::vec4(a.x, a.y, a.z, 1.0));
+	        skel_vertices.push_back(glm::vec4(b.x, b.y, b.z, 1.0));
+	        skel_lines.push_back(glm::uvec2(bone_index++,bone_index++));
+
+	        create_skeleton_t(child->end, b, skel_vertices, skel_lines);
+        }
+
+}
+

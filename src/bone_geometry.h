@@ -9,6 +9,7 @@
 #include <mmdadapter.h>
 
 
+struct Bone;
 
 struct BoundingBox {
 	BoundingBox()
@@ -22,23 +23,28 @@ struct Joint {
 	// FIXME: Implement your Joint data structure.
 	// Note: PMD represents weights on joints, but you need weights on
 	//       bones to calculate the actual animation.
+    Joint(int _ID, glm::vec3 _offset, int _parentID) : ID(_ID), 
+          offset(_offset), parentID(_parentID) {}
+
 	
 	int ID;
 	int parentID;	
 	glm::vec3 offset;
-	// std::vector<Joint*> child;
-	// Value of some type, the weight probs
+	std::vector<Bone*> children;
 
 };
 struct Bone {
-	Joint origin;
-	Joint end;
-	std::vector<int> children;
+    Bone(Joint* _end, Joint* _origin) :
+        end(_end), origin(_origin) {}
+
+	Joint* origin;
+	Joint* end;
+
 	double length;
+
 	glm::vec3 tangentDir;
 	glm::vec3 normalDir;
 	glm::vec3 binormalDir;
-
 	glm::mat4 transform;
 	glm::mat4 rotate;
 
@@ -46,10 +52,23 @@ struct Bone {
 };
 
 struct Skeleton {
-	Bone root; // ???
-	std::vector<Joint> joints;
-	std::vector<Bone> bones;
-	int num_Bones;
+	Joint* root;
+	std::vector<Joint*> joints;
+	std::vector<Bone*> bones;
+	int total_bones;
+
+	~Skeleton(){
+		for (std::vector<Joint*>::iterator it = joints.begin();
+         it != joints.end(); ++it){
+
+         	delete *it;
+        } 	
+
+        for (std::vector<Bone*>::iterator it = bones.begin();
+         it != bones.end(); ++it){
+         	delete *it;
+        } 	
+	}
 	// FIXME: create skeleton and bone data structures
 };
 
@@ -70,7 +89,7 @@ struct Mesh {
 	void updateAnimation();
 	int getNumberOfBones() const 
 	{ 
-		return skeleton.num_Bones;
+		return skeleton.total_bones;
 		// FIXME: return number of bones in skeleton
 		// return num_Bones;
 	}
