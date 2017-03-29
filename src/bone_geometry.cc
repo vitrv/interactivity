@@ -87,7 +87,6 @@ void Mesh::loadpmd(const std::string& fn)
 	    }
 
     }
-    printf("lvl 1 children: %d\n", skeleton.root->children.size() );
 
 }
 
