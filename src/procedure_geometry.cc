@@ -21,17 +21,26 @@ void create_floor(std::vector<glm::vec4>& floor_vertices, std::vector<glm::uvec3
 // around in the vertex shader to produce a very smooth cylinder.  We only
 // need to send a small number of points.  Controlling the grid size gives a
 // nice wireframe.
-void find_bone_directions(Skeleton bob){
-	//for (std::vector<Bone>::iterator it = bob.bones.begin() ; it != bob.bones.end(); ++it){
-	//	Bone temp = *it;
-		
-	//}
+void find_bone_directions(Joint* root){
+	for (std::vector<Bone*>::iterator it = root->children.begin() ; it != root->children.end(); ++it){
+		Bone* temp = *it;
+		temp->tangentDir = temp->end->offset - temp->origin->offset;
+		glm::vec3 vH = temp->tangentDir;
+		if(vH.x < vH.y && vH.x < vH.z){
+			vH.x = 1;
+		}else if(vH.y < vH.x && vH.y < vH.z){
+			vH.y = 1;
+		}else{
+			vH.z = 1;
+		}
+		vH = cross(temp->tangentDir, vH);
+		temp->normalDir = vH/length(vH);
+		temp->binormalDir = cross(temp->tangentDir, temp->normalDir);
+	}
 }
 
 void create_skeleton(Joint* root, std::vector<glm::vec4>& skel_vertices, 
-	                 std::vector<glm::uvec2>& skel_lines ){
-
-   
+	                 std::vector<glm::uvec2>& skel_lines ){   
 
     for (std::vector<Bone*>::iterator it = root->children.begin();
         it != root->children.end(); ++it){

@@ -1,3 +1,4 @@
+#define GLM_SWIZZLE
 #include "gui.h"
 #include "config.h"
 #include <jpegio.h>
@@ -7,6 +8,9 @@
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
+#include <glm/glm.hpp>
+
+using namespace glm;
 
 namespace {
 	// Intersect a cylinder with radius 1/2, height 1, with base centered at
@@ -111,6 +115,22 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
 
 	// FIXME: highlight bones that have been moused over
 	current_bone_ = -1;
+
+
+	// Get Ray that the mouse is pointing for bone picking
+	float x = (2.0f * mouse_x)/window_width_ - 1.0f;
+	float y = 1.0f - (2.0f * mouse_y) / window_height_;
+	float z = 1.0f;
+	vec3 ray_nds = vec3(x,y,z);
+	vec4 ray_clip = vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
+	vec4 ray_eye = inverse(projection_matrix_) * ray_clip;
+	ray_eye = vec4(ray_eye.x, ray_eye.y, -1.0, 0.0);
+	vec3 ray_wor = (inverse(view_matrix_)*ray_eye).xyz();
+	ray_wor = normalize(ray_wor);
+
+	printf("Mouse Ray is at World Position%f%f%f\n",ray_wor.x, ray_wor.y,ray_wor.z );
+
+	// Got Ray World for Bone Picking
 }
 
 void GUI::mouseButtonCallback(int button, int action, int mods)
