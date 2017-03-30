@@ -40,6 +40,9 @@ public:
 	bool setCurrentBone(int i);
 
 	bool isTransparent() const { return transparent_; }
+
+	bool IntersectCylinder(const glm::vec3& origin, const glm::vec3& direction,
+			float radius, float height, float* t);
 private:
 	GLFWwindow* window_;
 	Mesh* mesh_;
@@ -59,6 +62,9 @@ private:
 	float rotation_speed_ = 0.02f;
 	float zoom_speed_ = 0.1f;
 	float aspect_;
+    
+    glm::vec3 ray_origin;
+    glm::vec3 ray_dir;
 
 	glm::vec3 eye_ = glm::vec3(0.0f, 0.1f, camera_distance_);
 	glm::vec3 up_ = glm::vec3(0.0f, 1.0f, 0.0f);

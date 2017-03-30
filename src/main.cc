@@ -263,9 +263,10 @@ int main(int argc, char* argv[])
 		draw_cylinder = true;
 #endif
 		// FIXME: Draw bones first.
-		bone_pass.setup();
-		CHECK_GL_ERROR(glDrawElements(GL_LINES, skel_lines.size() * 2, GL_UNSIGNED_INT, 0));
-
+		if(gui.isTransparent()){
+			bone_pass.setup();
+			CHECK_GL_ERROR(glDrawElements(GL_LINES, skel_lines.size() * 2, GL_UNSIGNED_INT, 0));
+		}	
 		// Then draw floor.
 		if (draw_floor) {
 			floor_pass.setup();

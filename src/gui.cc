@@ -12,16 +12,38 @@
 
 using namespace glm;
 
-namespace {
+//namespace {
 	// Intersect a cylinder with radius 1/2, height 1, with base centered at
 	// (0, 0, 0) and up direction (0, 1, 0).
-	bool IntersectCylinder(const glm::vec3& origin, const glm::vec3& direction,
+	bool GUI::IntersectCylinder(const glm::vec3& origin, const glm::vec3& direction,
 			float radius, float height, float* t)
 	{
 		//FIXME perform proper ray-cylinder collision detection
+		float ct; //Cylinder t
+		float rt; //Ray t
+
+		float a = dot(direction, direction);
+		float b = dot(direction, ray_dir); 
+		float c = dot(ray_dir, ray_dir); 
+		float d = dot(direction, (origin - ray_origin));  
+		float e = dot(ray_dir, (origin - ray_origin)); 
+
+		ct = (dot(b,e) - dot(c,d)) / (dot(a,c) - dot(b,b));
+
+		rt = (dot(a,e) - dot(b,d)) / (dot(a,c) - dot(b,b));
+
+		glm::vec3 cyl_at = origin + ct * direction;
+		glm::vec3 ray_at = ray_origin + rt * ray_dir; 
+
+		float dist = length( cyl_at - ray_at); 
+
+		if (dist > radius) return false;
+
+		if (ct < 0 || ct > height) return false;
+
 		return true;
 	}
-}
+//}
 
 GUI::GUI(GLFWwindow* window)
 	:window_(window)
@@ -118,17 +140,33 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
 
 
 	// Get Ray that the mouse is pointing for bone picking
-	float x = (2.0f * mouse_x)/window_width_ - 1.0f;
-	float y = 1.0f - (2.0f * mouse_y) / window_height_;
+    
+    ray_origin = eye_;
+
+	float x = (2.0f * current_x_)/window_width_ - 1.0f;
+	float y = 1.0f - (2.0f * current_y_) / window_height_;
 	float z = 1.0f;
-	vec3 ray_nds = vec3(x,y,z);
+	vec3 ray_nds = vec3(-x,-y,z);
 	vec4 ray_clip = vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
 	vec4 ray_eye = inverse(projection_matrix_) * ray_clip;
 	ray_eye = vec4(ray_eye.x, ray_eye.y, -1.0, 0.0);
-	vec3 ray_wor = (inverse(view_matrix_)*ray_eye).xyz();
-	ray_wor = normalize(ray_wor);
+	vec3 ray_world = (inverse(view_matrix_)*ray_eye).xyz();
+	ray_world = normalize(ray_world);
 
-	printf("Mouse Ray is at World Position%f%f%f\n",ray_wor.x, ray_wor.y,ray_wor.z );
+	ray_dir = normalize(glm::vec3(window_width_* ray_world.x, 
+		                window_height_ * ray_world.y, 1.0));
+
+	ray_dir = ray_world;
+
+    float t;
+    glm::vec3 cyl_origin = glm::vec3(0.0, 0.0, 0.0);
+    glm::vec3 cyl_dir = glm::vec3(0.0, 1.0, 0.0);
+
+	bool isect = IntersectCylinder(cyl_origin, cyl_dir , kCylinderRadius, 1, &t);
+
+	if(isect) printf("Intersected something!!!\n");
+
+	//printf("Mouse Ray is at World Position %f, %f, %f\n",ray_world.x, ray_world.y,ray_world.z );
 
 	// Got Ray World for Bone Picking
 }
