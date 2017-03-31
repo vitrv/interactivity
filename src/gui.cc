@@ -43,6 +43,36 @@ using namespace glm;
 
 		return true;
 	}
+
+	bool GUI::Intersect(Joint*& root, glm::vec3& base_offset, float* t) {
+        
+        bool isect;
+
+        for (std::vector<Bone*>::iterator it = root->children.begin();
+             it != root->children.end(); ++it){
+
+
+    		Bone* child = *it;
+
+        	glm::vec3 a = base_offset;
+        	glm::vec3 o = child->end->offset;
+        	glm::vec3 b = a + child->end->offset;
+
+        	glm::vec3 cyl_origin = a;
+        	glm::vec3 cyl_dir = normalize(o);
+        	isect = IntersectCylinder(cyl_origin, cyl_dir , kCylinderRadius, length(o), t);
+        	if (isect) return true;
+
+        	return Intersect(child->end, b, t);
+
+
+
+        }
+
+        return false;
+       
+   
+	}
 //}
 
 GUI::GUI(GLFWwindow* window)
@@ -162,13 +192,9 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
     glm::vec3 cyl_origin = glm::vec3(0.0, 0.0, 0.0);
     glm::vec3 cyl_dir = glm::vec3(0.0, 1.0, 0.0);
 
-	bool isect = IntersectCylinder(cyl_origin, cyl_dir , kCylinderRadius, 1, &t);
+	bool isect = Intersect(mesh_->skeleton.root, mesh_->skeleton.root->offset, &t);
 
 	if(isect) printf("Intersected something!!!\n");
-
-	//printf("Mouse Ray is at World Position %f, %f, %f\n",ray_world.x, ray_world.y,ray_world.z );
-
-	// Got Ray World for Bone Picking
 }
 
 void GUI::mouseButtonCallback(int button, int action, int mods)

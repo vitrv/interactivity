@@ -4,8 +4,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
+#include "bone_geometry.h"
 
 class Mesh;
+struct Joint;
 
 /*
  * Hint: call glUniformMatrix4fv on thest pointers
@@ -43,6 +45,8 @@ public:
 
 	bool IntersectCylinder(const glm::vec3& origin, const glm::vec3& direction,
 			float radius, float height, float* t);
+
+	bool Intersect(Joint*& root, glm::vec3& base_offset, float* t);
 private:
 	GLFWwindow* window_;
 	Mesh* mesh_;
