@@ -26,7 +26,7 @@ struct Joint {
     Joint(int _ID, glm::vec3 _offset, int _parentID) : ID(_ID), 
           offset(_offset), parentID(_parentID) {}
 
-	
+	Bone* parentBone;
 	int ID;
 	int parentID;	
 	glm::vec3 offset;
@@ -46,7 +46,10 @@ struct Bone {
 	glm::vec3 normalDir;
 	glm::vec3 binormalDir;
 	glm::mat4 transform;
+	glm::mat4 disformed;
 	glm::mat4 rotate;
+	// Parent Bone's Inverse Rotation Matrix;
+	glm::mat4 baseR;
 
 
 };
