@@ -98,6 +98,7 @@ int counter =0;
 		    translate[3][2] = origin.z;
 
             glm::mat4 rotate(0.0);
+            
 		    glm::mat4 scale(0.0);
 		    scale[0][0] =  1;
             scale[1][1] = length(child->end->offset);
