@@ -77,7 +77,7 @@ void Mesh::loadpmd(const std::string& fn)
 	    else if (joint_map.find(joint->parentID) != joint_map.end()){
 
             Joint* parent = joint_map.at(joint->parentID);
-
+            
 	    	Bone* bone = new Bone(joint, parent);
 
 	    	skeleton.bones.push_back(bone);

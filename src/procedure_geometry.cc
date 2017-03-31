@@ -36,6 +36,52 @@ void find_bone_directions(std::vector<Bone*> bones){
 		vH = cross(temp->tangentDir, vH);
 		temp->normalDir = vH/length(vH);
 		temp->binormalDir = cross(temp->tangentDir, temp->normalDir);
+
+
+
+	}
+}
+
+void initialize_matrix (std::vector<Bone*> bones){
+	std::map<int,glm::mat4> Anti_map;
+	for (std::vector<Bone*>::iterator it = bones.begin() ; it != bones.end(); ++it){
+		Bone* temp = *it;
+
+			//Establish Identity Matrix
+			temp->transform [0][0] = 1;
+			temp->transform [1][1] = 1;
+			temp->transform [2][2] = 1;
+			temp->transform [3][3] = 1;
+		if(temp->origin->parentID == -1){
+			//Push in the Vector Transformation
+			temp->transform [3][0] = temp->origin->offset.x;
+			temp->transform [3][1] = temp->origin->offset.y;
+			temp->transform [3][2] = temp->origin->offset.z;
+			temp->rotate	= glm::mat4(glm::vec4(temp->binormalDir,0.0),
+										glm::vec4(temp->normalDir,0.0),
+										glm::vec4(temp->tangentDir,0.0),
+										glm::vec4(0.0,0.0,0.0,1.0));
+			temp->disformed = temp->rotate;
+			Anti_map.insert(std::make_pair(temp->end->ID,temp->rotate));    	 	
+		
+
+		}else{
+			temp->transform [3][0] = 0;
+			temp->transform [3][1] = 0;
+			temp->transform [3][2] = temp->length;
+			if(Anti_map.find(temp->origin->parentID) != Anti_map.end()){
+				temp->baseR = glm::inverse(Anti_map.at(temp->origin->parentID));
+				temp->rotate	= glm::transpose(temp->baseR) * glm::mat4(glm::vec4(temp->binormalDir,0.0),
+										glm::vec4(temp->normalDir,0.0),
+										glm::vec4(temp->tangentDir,0.0),
+										glm::vec4(0.0,0.0,0.0,1.0));
+				temp->disformed = temp->rotate;
+			}
+
+		}
+
+
+
 	}
 }
 
