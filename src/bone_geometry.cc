@@ -1,5 +1,6 @@
 #include "config.h"
 #include "bone_geometry.h"
+#include "procedure_geometry.h"
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
@@ -87,6 +88,8 @@ void Mesh::loadpmd(const std::string& fn)
 	    }
 
     }
+	find_bone_directions(skeleton.bones);
+	initialize_matrix(skeleton.bones);
 
 }
 

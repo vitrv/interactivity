@@ -24,7 +24,7 @@ void create_floor(std::vector<glm::vec4>& floor_vertices, std::vector<glm::uvec3
 void find_bone_directions(std::vector<Bone*> bones){
 	for (std::vector<Bone*>::iterator it = bones.begin() ; it != bones.end(); ++it){
 		Bone* temp = *it;
-		temp->tangentDir = temp->end->offset - temp->origin->offset;
+		temp->tangentDir = normalize(temp->end->offset);
 		glm::vec3 vH = temp->tangentDir;
 		if(vH.x < vH.y && vH.x < vH.z){
 			vH.x = 1;
@@ -34,8 +34,8 @@ void find_bone_directions(std::vector<Bone*> bones){
 			vH.z = 1;
 		}
 		vH = cross(temp->tangentDir, vH);
-		temp->normalDir = vH/length(vH);
-		temp->binormalDir = cross(temp->tangentDir, temp->normalDir);
+		temp->normalDir = normalize(vH/length(vH));
+		temp->binormalDir = normalize(cross(temp->tangentDir, temp->normalDir));
 
 
 
@@ -75,6 +75,7 @@ void initialize_matrix (std::vector<Bone*> bones){
 										glm::vec4(temp->normalDir,0.0),
 										glm::vec4(temp->tangentDir,0.0),
 										glm::vec4(0.0,0.0,0.0,1.0));
+				Anti_map.insert(std::make_pair(temp->end->ID,temp->rotate));  
 				temp->disformed = temp->rotate;
 			}
 

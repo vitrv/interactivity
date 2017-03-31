@@ -54,6 +54,14 @@ const char* cyl_fragment_shader =
 #include "shaders/cyl.frag"
 ;
 
+const char* norm_fragment_shader =
+#include "shaders/norm.frag"
+;
+
+const char* binorm_fragment_shader =
+#include "shaders/binorm.frag"
+;
+
 // FIXME: Add more shaders here.
 
 void ErrorCallback(int error, const char* description) {
@@ -107,6 +115,9 @@ int main(int argc, char* argv[])
 	std::vector<glm::vec4> skel_vertices;
 	std::vector<glm::uvec2> skel_lines;
 
+	gui.norm_lines.push_back(glm::uvec2(0,1));
+	gui.binorm_lines.push_back(glm::uvec2(0,1));
+
 	Mesh mesh;
 	mesh.loadpmd(argv[1]);
 	std::cout << "Loaded object  with  " << mesh.vertices.size()
@@ -124,9 +135,8 @@ int main(int argc, char* argv[])
 	gui.assignMesh(&mesh);
 
 	create_skeleton(mesh.skeleton.root, skel_vertices, skel_lines);
-	Skeleton bob = mesh.skeleton;
-	find_bone_directions(bob.bones);
-//WTHSDFL:SJDF:SAIDG
+
+
 	glm::vec4 light_position = glm::vec4(0.0f, 100.0f, 0.0f, 1.0f);
 	MatrixPointers mats; // Define MatrixPointers here for lambda to capture
 	/*
@@ -236,6 +246,25 @@ int main(int argc, char* argv[])
 			{ "fragment_color" }
 			); 
 
+    RenderDataInput norm_pass_input;
+	norm_pass_input.assign(0, "vertex_position", gui.norm_vertices.data(), gui.norm_vertices.size(), 4, GL_FLOAT);
+	norm_pass_input.assign_index(gui.norm_lines.data(), gui.norm_lines.size(), 2);
+    RenderPass norm_pass(-1,
+			norm_pass_input,
+			{ bone_vertex_shader, bone_geometry_shader, norm_fragment_shader},
+			{ std_model, std_view, std_proj},
+			{ "fragment_color" }
+			); 
+
+    RenderDataInput binorm_pass_input;
+	binorm_pass_input.assign(0, "vertex_position", gui.binorm_vertices.data(), gui.binorm_vertices.size(), 4, GL_FLOAT);
+	binorm_pass_input.assign_index(gui.binorm_lines.data(), gui.binorm_lines.size(), 2);
+    RenderPass binorm_pass(-1,
+			binorm_pass_input,
+			{ bone_vertex_shader, bone_geometry_shader, binorm_fragment_shader},
+			{ std_model, std_view, std_proj},
+			{ "fragment_color" }
+			); 
 
 	RenderDataInput floor_pass_input;
 	floor_pass_input.assign(0, "vertex_position", floor_vertices.data(), floor_vertices.size(), 4, GL_FLOAT);
@@ -285,10 +314,24 @@ int main(int argc, char* argv[])
 		// FIXME: Draw bones first.
 		if(gui.isTransparent()){
 			if(draw_cylinder){
+				//Cylinder
 				cyl_pass.updateVBO(0, gui.cyl_draw_vertices.data(),
 				                    gui.cyl_draw_vertices.size());
 				cyl_pass.setup();
 				CHECK_GL_ERROR(glDrawElements(GL_LINES, gui.cyl_lines.size() * 2, GL_UNSIGNED_INT, 0));
+                
+                //Normal
+				norm_pass.updateVBO(0, gui.norm_vertices.data(),
+				                    gui.norm_vertices.size());
+				norm_pass.setup();
+				CHECK_GL_ERROR(glDrawElements(GL_LINES, gui.norm_lines.size() * 2, GL_UNSIGNED_INT, 0));
+
+				//Binormal
+				binorm_pass.updateVBO(0, gui.binorm_vertices.data(),
+				                    gui.binorm_vertices.size());
+				binorm_pass.setup();
+				CHECK_GL_ERROR(glDrawElements(GL_LINES, gui.binorm_lines.size() * 2, GL_UNSIGNED_INT, 0));
+
 			}
 			bone_pass.setup();
 			CHECK_GL_ERROR(glDrawElements(GL_LINES, skel_lines.size() * 2, GL_UNSIGNED_INT, 0));

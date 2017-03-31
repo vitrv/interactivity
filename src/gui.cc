@@ -8,6 +8,7 @@
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
+#include <glm/gtx/vector_angle.hpp> 
 #include <glm/glm.hpp>
 #include <math.h>
 
@@ -61,10 +62,10 @@ int counter =0;
         	glm::vec3 b = a + child->end->offset;
 
         	glm::vec3 cyl_origin = a;
-        	glm::vec3 cyl_dir = normalize(child->tangentDir);
+        	glm::vec3 cyl_dir = normalize(o);
         	isect = IntersectCylinder(cyl_origin, cyl_dir , kCylinderRadius, length(o), t);
         	if (isect) {
-        		transformCylinder(child, cyl_origin, cyl_dir);
+        		transformCylinder(child, cyl_origin, normalize(cyl_dir));
         		setCurrentBone(child->end->ID);
         		return true;}
 
@@ -82,6 +83,8 @@ int counter =0;
 		const glm::vec3& direction ){
 
 		cyl_draw_vertices.clear();
+		norm_vertices.clear();
+		binorm_vertices.clear();
 
 		for (std::vector<glm::vec4>::iterator it = cyl_vertices.begin();
              it != cyl_vertices.end(); ++it){
@@ -97,18 +100,25 @@ int counter =0;
 		    translate[3][1] = origin.y;
 		    translate[3][2] = origin.z;
 
-            glm::mat4 rotate(0.0);
-            
+		    glm::vec3 axis = cross(glm::vec3(0.0,1.0,0.0), normalize(direction));
+            float angle = glm::angle(glm::vec3(0.0,1.0,0.0), normalize(direction));
+
+
+            glm::mat4 rotate = glm::rotate(angle, normalize(axis));
+
 		    glm::mat4 scale(0.0);
 		    scale[0][0] =  1;
             scale[1][1] = length(child->end->offset);
             scale[2][2] =  1;
             scale[3][3] =  1;
             
-            glm::vec4 new_vert = translate * scale * vertex;
+            glm::vec4 new_vert = translate * rotate * scale * vertex;
 
             cyl_draw_vertices.push_back(new_vert);
-
+            norm_vertices.push_back(glm::vec4(origin, 1.0));
+            norm_vertices.push_back(glm::vec4(origin + child->normalDir, 1.0));
+            binorm_vertices.push_back(glm::vec4(origin, 1.0));
+            binorm_vertices.push_back(glm::vec4(origin + child->binormalDir, 1.0));
 
 		}	
 
@@ -288,21 +298,21 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
     
     ray_origin = eye_;
 
-	float x = (2.0f * current_x_)/window_width_ - 1.0f;
-	float y = 1.0f - (2.0f * current_y_) / window_height_;
+	float x = (2.0f * mouse_x)/window_width_ - 1.0f;
+	float y = 1.0f - (2.0f * mouse_y) / window_height_;
 	float z = 1.0f;
-	vec3 ray_nds = vec3(-x,-y,z);
+	vec3 ray_nds = vec3(x,y,z);
 	vec4 ray_clip = vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
 	vec4 ray_eye = inverse(projection_matrix_) * ray_clip;
 	ray_eye = vec4(ray_eye.x, ray_eye.y, -1.0, 0.0);
 	vec3 ray_world = (inverse(view_matrix_)*ray_eye).xyz();
 	ray_world = normalize(ray_world);
-	ray_world.x *= -1; 
+	//ray_world.x *= -1; 
 	//ray_world.y *= -1; 
 	//ray_world.z *= -1; 
 
-	//ray_dir = normalize(glm::vec3(window_width_* ray_world.x, 
-	//	                window_height_ * ray_world.y, 1.0));
+	ray_dir = normalize(glm::vec3(window_width_* ray_world.x, 
+	                window_height_ * ray_world.y, 1.0));
 
 	ray_dir = ray_world;
 

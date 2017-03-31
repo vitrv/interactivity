@@ -55,6 +55,12 @@ public:
 	std::vector<glm::vec4> cyl_draw_vertices;
 	std::vector<glm::uvec2> cyl_lines;
 
+	std::vector<glm::vec4> norm_vertices;
+	std::vector<glm::uvec2> norm_lines;
+
+	std::vector<glm::vec4> binorm_vertices;
+	std::vector<glm::uvec2> binorm_lines;
+
 private:
 	GLFWwindow* window_;
 	Mesh* mesh_;
@@ -77,6 +83,8 @@ private:
     
     glm::vec3 ray_origin;
     glm::vec3 ray_dir;
+
+
 
     std::vector<glm::vec4> cyl_vertices;
 
