@@ -11,6 +11,7 @@
 #include <glm/glm.hpp>
 
 using namespace glm;
+int counter =0;
 
 //namespace {
 	// Intersect a cylinder with radius 1/2, height 1, with base centered at
@@ -59,7 +60,7 @@ using namespace glm;
         	glm::vec3 b = a + child->end->offset;
 
         	glm::vec3 cyl_origin = a;
-        	glm::vec3 cyl_dir = normalize(o);
+        	glm::vec3 cyl_dir = normalize(child->tangentDir);
         	isect = IntersectCylinder(cyl_origin, cyl_dir , kCylinderRadius, length(o), t);
         	if (isect) return true;
 
@@ -195,7 +196,8 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
 
 	bool isect = Intersect(mesh_->skeleton.root, mesh_->skeleton.root->offset, &t);
 
-	if(isect) printf("Intersected something!!!\n");
+	
+	if(isect) printf("Intersected something!!!%d\n", counter++);
 }
 
 void GUI::mouseButtonCallback(int button, int action, int mods)

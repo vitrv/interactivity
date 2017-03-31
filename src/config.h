@@ -5,7 +5,7 @@
  * Global variables go here.
  */
 
-const float kCylinderRadius = 0.25;
+const float kCylinderRadius = 0.5;
 const int kMaxBones = 128;
 /*
  * Extra credit: what would happen if you set kNear to 1e-5? How to solve it?
