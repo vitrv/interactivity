@@ -63,8 +63,9 @@ using namespace glm;
         	isect = IntersectCylinder(cyl_origin, cyl_dir , kCylinderRadius, length(o), t);
         	if (isect) return true;
 
-        	return Intersect(child->end, b, t);
-
+        	isect = Intersect(child->end, b, t);
+            
+            if (isect) return true;
 
 
         }
