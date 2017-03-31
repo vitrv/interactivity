@@ -50,6 +50,10 @@ const char* bone_geometry_shader =
 #include "shaders/bone.geom"
 ;
 
+const char* cyl_fragment_shader =
+#include "shaders/cyl.frag"
+;
+
 // FIXME: Add more shaders here.
 
 void ErrorCallback(int error, const char* description) {
@@ -93,6 +97,9 @@ int main(int argc, char* argv[])
 
 	std::vector<glm::vec4> floor_vertices;
 	std::vector<glm::uvec3> floor_faces;
+
+    gui.initCylinder();
+
 	create_floor(floor_vertices, floor_faces);
 
 	// FIXME: add code to create bone and cylinder geometry
@@ -217,6 +224,16 @@ int main(int argc, char* argv[])
 			{ "fragment_color" }
 			); 
 
+    RenderDataInput cyl_pass_input;
+	cyl_pass_input.assign(0, "vertex_position", gui.cyl_draw_vertices.data(), gui.cyl_draw_vertices.size(), 4, GL_FLOAT);
+	cyl_pass_input.assign_index(gui.cyl_lines.data(), gui.cyl_lines.size(), 2);
+    RenderPass cyl_pass(-1,
+			cyl_pass_input,
+			{ bone_vertex_shader, bone_geometry_shader, cyl_fragment_shader},
+			{ std_model, std_view, std_proj},
+			{ "fragment_color" }
+			); 
+
 
 	RenderDataInput floor_pass_input;
 	floor_pass_input.assign(0, "vertex_position", floor_vertices.data(), floor_vertices.size(), 4, GL_FLOAT);
@@ -256,6 +273,7 @@ int main(int argc, char* argv[])
 		gui.updateMatrices();
 		mats = gui.getMatrixPointers();
 
+	    
 		int current_bone = gui.getCurrentBone();
 #if 1
 		draw_cylinder = (current_bone != -1 && gui.isTransparent());
@@ -264,6 +282,12 @@ int main(int argc, char* argv[])
 #endif
 		// FIXME: Draw bones first.
 		if(gui.isTransparent()){
+			if(draw_cylinder){
+				cyl_pass.updateVBO(0, gui.cyl_draw_vertices.data(),
+				                    gui.cyl_draw_vertices.size());
+				cyl_pass.setup();
+				CHECK_GL_ERROR(glDrawElements(GL_LINES, gui.cyl_lines.size() * 2, GL_UNSIGNED_INT, 0));
+			}
 			bone_pass.setup();
 			CHECK_GL_ERROR(glDrawElements(GL_LINES, skel_lines.size() * 2, GL_UNSIGNED_INT, 0));
 		}	

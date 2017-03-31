@@ -47,6 +47,14 @@ public:
 			float radius, float height, float* t);
 
 	bool Intersect(Joint*& root, glm::vec3& base_offset, float* t);
+
+	void initCylinder();
+	void transformCylinder(Bone* child, const glm::vec3& origin, 
+		const glm::vec3& direction);
+
+	std::vector<glm::vec4> cyl_draw_vertices;
+	std::vector<glm::uvec2> cyl_lines;
+
 private:
 	GLFWwindow* window_;
 	Mesh* mesh_;
@@ -69,6 +77,8 @@ private:
     
     glm::vec3 ray_origin;
     glm::vec3 ray_dir;
+
+    std::vector<glm::vec4> cyl_vertices;
 
 	glm::vec3 eye_ = glm::vec3(0.0f, 0.1f, camera_distance_);
 	glm::vec3 up_ = glm::vec3(0.0f, 1.0f, 0.0f);

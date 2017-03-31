@@ -9,6 +9,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/glm.hpp>
+#include <math.h>
 
 using namespace glm;
 
@@ -61,10 +62,12 @@ using namespace glm;
         	glm::vec3 cyl_origin = a;
         	glm::vec3 cyl_dir = normalize(o);
         	isect = IntersectCylinder(cyl_origin, cyl_dir , kCylinderRadius, length(o), t);
-        	if (isect) return true;
+        	if (isect) {
+        		transformCylinder(child, cyl_origin, cyl_dir);
+        		setCurrentBone(child->end->ID);
+        		return true;}
 
         	isect = Intersect(child->end, b, t);
-            
             if (isect) return true;
 
 
@@ -73,6 +76,115 @@ using namespace glm;
         return false;
        
    
+	}
+	void GUI::transformCylinder(Bone* child, const glm::vec3& origin, 
+		const glm::vec3& direction ){
+
+		cyl_draw_vertices.clear();
+
+		for (std::vector<glm::vec4>::iterator it = cyl_vertices.begin();
+             it != cyl_vertices.end(); ++it){
+
+			glm::vec4 vertex = *it;
+
+		    glm::mat4 translate(0.0);
+		    translate[0][0] = 1;
+		    translate[1][1] = 1;
+		    translate[2][2] = 1;
+		    translate[3][3] = 1;
+		    translate[3][0] = origin.x;
+		    translate[3][1] = origin.y;
+		    translate[3][2] = origin.z;
+
+            glm::mat4 rotate(0.0);
+		    glm::mat4 scale(0.0);
+		    scale[0][0] =  1;
+            scale[1][1] = length(child->end->offset);
+            scale[2][2] =  1;
+            scale[3][3] =  1;
+            
+            glm::vec4 new_vert = translate * scale * vertex;
+
+            cyl_draw_vertices.push_back(new_vert);
+
+
+		}	
+
+	}
+	void GUI::initCylinder(){
+
+        int line_index = 0;
+		cyl_vertices.push_back(glm::vec4(0.0, 0.0, kCylinderRadius, 1.0));
+        cyl_vertices.push_back(glm::vec4(0.0, 1.0, kCylinderRadius, 1.0));
+        cyl_lines.push_back(glm::uvec2(line_index++,line_index++));
+
+        cyl_vertices.push_back(glm::vec4(0.0, 0.0, -kCylinderRadius, 1.0));
+        cyl_vertices.push_back(glm::vec4(0.0, 1.0, -kCylinderRadius, 1.0));
+        cyl_lines.push_back(glm::uvec2(line_index++,line_index++));
+
+        cyl_vertices.push_back(glm::vec4(kCylinderRadius, 0.0, 0.0, 1.0));
+        cyl_vertices.push_back(glm::vec4(kCylinderRadius, 1.0, 0.0, 1.0));
+        cyl_lines.push_back(glm::uvec2(line_index++,line_index++));
+
+        cyl_vertices.push_back(glm::vec4(-kCylinderRadius, 0.0, 0.0, 1.0));
+        cyl_vertices.push_back(glm::vec4(-kCylinderRadius, 1.0, 0.0, 1.0));
+        cyl_lines.push_back(glm::uvec2(line_index++,line_index++));
+
+        float z = sqrt(pow(kCylinderRadius, 2) / 2);
+
+
+        cyl_vertices.push_back(glm::vec4(z, 0.0, z, 1.0));
+        cyl_vertices.push_back(glm::vec4(z, 1.0, z, 1.0));
+        cyl_lines.push_back(glm::uvec2(line_index++,line_index++));
+
+        cyl_vertices.push_back(glm::vec4(-z, 0.0, z, 1.0));
+        cyl_vertices.push_back(glm::vec4(-z, 1.0, z, 1.0));
+        cyl_lines.push_back(glm::uvec2(line_index++,line_index++));
+
+        cyl_vertices.push_back(glm::vec4(z, 0.0, -z, 1.0));
+        cyl_vertices.push_back(glm::vec4(z, 1.0, -z, 1.0));
+        cyl_lines.push_back(glm::uvec2(line_index++,line_index++));
+
+        cyl_vertices.push_back(glm::vec4(-z, 0.0, -z, 1.0));
+        cyl_vertices.push_back(glm::vec4(-z, 1.0, -z, 1.0));
+        cyl_lines.push_back(glm::uvec2(line_index++,line_index++));
+
+        //Ring
+        for(int v = 0; v <= 5; v++){
+            float h = (float)v * (0.2);
+
+	        cyl_vertices.push_back(glm::vec4(kCylinderRadius, h, 0.0, 1.0));
+	        cyl_vertices.push_back(glm::vec4(z, h, z, 1.0));
+	        cyl_lines.push_back(glm::uvec2(line_index++,line_index++));
+
+	        cyl_vertices.push_back(glm::vec4(z, h, z, 1.0));
+	        cyl_vertices.push_back(glm::vec4(0.0, h, kCylinderRadius, 1.0));
+	        cyl_lines.push_back(glm::uvec2(line_index++,line_index++));
+
+	        cyl_vertices.push_back(glm::vec4(0.0, h, kCylinderRadius, 1.0));
+	        cyl_vertices.push_back(glm::vec4(-z, h, z, 1.0));
+	        cyl_lines.push_back(glm::uvec2(line_index++,line_index++));
+
+	        cyl_vertices.push_back(glm::vec4(-z, h, z, 1.0));
+	        cyl_vertices.push_back(glm::vec4(-kCylinderRadius, h, 0.0, 1.0));
+	        cyl_lines.push_back(glm::uvec2(line_index++,line_index++));
+	        
+	        cyl_vertices.push_back(glm::vec4(-kCylinderRadius, h, 0.0, 1.0));
+	        cyl_vertices.push_back(glm::vec4(-z, h, -z, 1.0));
+	        cyl_lines.push_back(glm::uvec2(line_index++,line_index++));
+
+	        cyl_vertices.push_back(glm::vec4(-z, h, -z, 1.0));
+	        cyl_vertices.push_back(glm::vec4(0.0, h, -kCylinderRadius, 1.0));
+	        cyl_lines.push_back(glm::uvec2(line_index++,line_index++));
+
+	        cyl_vertices.push_back(glm::vec4(0.0, h, -kCylinderRadius, 1.0));
+	        cyl_vertices.push_back(glm::vec4(z, h, -z, 1.0));
+	        cyl_lines.push_back(glm::uvec2(line_index++,line_index++));
+
+	        cyl_vertices.push_back(glm::vec4(z, h, -z, 1.0));
+	        cyl_vertices.push_back(glm::vec4(kCylinderRadius, h, 0.0, 1.0));
+	        cyl_lines.push_back(glm::uvec2(line_index++,line_index++));
+        } 
 	}
 //}
 
@@ -183,9 +295,12 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
 	ray_eye = vec4(ray_eye.x, ray_eye.y, -1.0, 0.0);
 	vec3 ray_world = (inverse(view_matrix_)*ray_eye).xyz();
 	ray_world = normalize(ray_world);
+	ray_world.x *= -1; 
+	//ray_world.y *= -1; 
+	//ray_world.z *= -1; 
 
-	ray_dir = normalize(glm::vec3(window_width_* ray_world.x, 
-		                window_height_ * ray_world.y, 1.0));
+	//ray_dir = normalize(glm::vec3(window_width_* ray_world.x, 
+	//	                window_height_ * ray_world.y, 1.0));
 
 	ray_dir = ray_world;
 
@@ -195,7 +310,8 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
 
 	bool isect = Intersect(mesh_->skeleton.root, mesh_->skeleton.root->offset, &t);
 
-	if(isect) printf("Intersected something!!!\n");
+	//if(isect) printf("Intersected something!!!\n");
+	//else printf("intersected nothing\n");
 }
 
 void GUI::mouseButtonCallback(int button, int action, int mods)
