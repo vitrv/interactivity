@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
 	 */
 	gui.assignMesh(&mesh);
 
-	create_skeleton(mesh.skeleton.root, skel_vertices, skel_lines);
+	create_skeleton1(mesh.skeleton.root, skel_vertices, skel_lines);
 
 
 	glm::vec4 light_position = glm::vec4(0.0f, 100.0f, 0.0f, 1.0f);

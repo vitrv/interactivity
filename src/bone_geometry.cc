@@ -89,7 +89,8 @@ void Mesh::loadpmd(const std::string& fn)
 
     }
 	find_bone_directions(skeleton.bones);
-	initialize_matrix(skeleton.bones);
+	// initialize_matrix(skeleton.bones);
+	initialize_matrix1(skeleton.root, glm::mat4(1.0));
 
 }
 
