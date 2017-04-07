@@ -135,6 +135,7 @@ int main(int argc, char* argv[])
 	gui.assignMesh(&mesh);
 
 	create_skeleton1(mesh.skeleton.root, skel_vertices, skel_lines);
+	setFirstrender();
 
 
 	glm::vec4 light_position = glm::vec4(0.0f, 100.0f, 0.0f, 1.0f);
@@ -303,7 +304,7 @@ int main(int argc, char* argv[])
 
 		gui.updateMatrices();
 		mats = gui.getMatrixPointers();
-
+		create_skeleton1(mesh.skeleton.root, skel_vertices, skel_lines);
 	    
 		int current_bone = gui.getCurrentBone();
 #if 1
@@ -332,7 +333,8 @@ int main(int argc, char* argv[])
 				binorm_pass.setup();
 				CHECK_GL_ERROR(glDrawElements(GL_LINES, gui.binorm_lines.size() * 2, GL_UNSIGNED_INT, 0));
 
-			}
+			}			
+			bone_pass.updateVBO(0, skel_vertices.data(), skel_vertices.size());
 			bone_pass.setup();
 			CHECK_GL_ERROR(glDrawElements(GL_LINES, skel_lines.size() * 2, GL_UNSIGNED_INT, 0));
 		}	

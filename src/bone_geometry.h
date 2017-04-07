@@ -39,6 +39,7 @@ struct Bone {
 
 	Joint* origin;
 	Joint* end;
+	std::vector<SparseTuple*> tup;
 
 	double length;
 
@@ -58,6 +59,7 @@ struct Skeleton {
 	Joint* root;
 	std::vector<Joint*> joints;
 	std::vector<Bone*> bones;
+	std::map<int,Bone*> bone_map;
 	int total_bones;
 
 	~Skeleton(){
@@ -74,6 +76,10 @@ struct Skeleton {
 	}
 	// FIXME: create skeleton and bone data structures
 };
+
+
+
+
 
 struct Mesh {
 	Mesh();
@@ -97,6 +103,7 @@ struct Mesh {
 		// return num_Bones;
 	}
 	glm::vec3 getCenter() const { return 0.5f * glm::vec3(bounds.min + bounds.max); }
+
 private:
 	void computeBounds();
 	void computeNormals();

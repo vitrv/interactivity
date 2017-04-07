@@ -3,6 +3,7 @@
 #include "config.h"
 #include <jpegio.h>
 #include "bone_geometry.h"
+#include "procedure_geometry.h"
 #include <iostream>
 #include <debuggl.h>
 #include <glm/gtc/matrix_access.hpp>
@@ -11,6 +12,8 @@
 #include <glm/gtx/vector_angle.hpp> 
 #include <glm/glm.hpp>
 #include <math.h>
+
+
 
 using namespace glm;
 int counter =0;
@@ -242,6 +245,10 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 		else
 			roll_speed = roll_speed_;
 		// FIXME: actually roll the bone here
+		if(current_bone_ != -1){
+			Bone* temp = mesh_->skeleton.bone_map.at(current_bone_);
+			keyDisform(temp,roll_speed);
+		}
 	} else if (key == GLFW_KEY_C && action != GLFW_RELEASE) {
 		fps_mode_ = !fps_mode_;
 	} else if (key == GLFW_KEY_LEFT_BRACKET && action == GLFW_RELEASE) {
@@ -254,7 +261,13 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 		current_bone_ %= mesh_->getNumberOfBones();
 	} else if (key == GLFW_KEY_T && action != GLFW_RELEASE) {
 		transparent_ = !transparent_;
-	}
+	} else if (key == GLFW_KEY_J && action != GLFW_RELEASE) {
+		if(current_bone_ != -1){
+			Bone* temp = mesh_->skeleton.bone_map.at(current_bone_);
+			keyDisform(temp,-1);
+		}
+		GUI::printToPNG();
+	} 
 }
 
 void GUI::mousePosCallback(double mouse_x, double mouse_y)
@@ -287,6 +300,8 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
 		look_ = glm::column(orientation_, 2);
 	} else if (drag_bone && current_bone_ != -1) {
 		// FIXME: Handle bone rotation
+		Bone* temp = mesh_->skeleton.bone_map.at(current_bone_);
+		dragDisform(temp,mouse_x,mouse_y);
 		return ;
 	}
 
@@ -315,6 +330,7 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
 	                window_height_ * ray_world.y, 1.0));
 
 	ray_dir = ray_world;
+
 
     float t;
     glm::vec3 cyl_origin = glm::vec3(0.0, 0.0, 0.0);
@@ -424,4 +440,53 @@ void GUI::MouseButtonCallback(GLFWwindow* window, int button, int action, int mo
 {
 	GUI* gui = (GUI*)glfwGetWindowUserPointer(window);
 	gui->mouseButtonCallback(button, action, mods);
+}
+
+void GUI::printToPNG(){
+	typedef unsigned char uchar;
+    // we will store the image data here
+    uchar *pixels;
+    // the thingy we use to write files
+    FILE * shot;
+
+
+    // generate an array large enough to hold the pixel data 
+    // (width*height*bytesPerPixel)
+    pixels = new unsigned char[window_width_*window_height_*3];
+    // read in the pixel data, TGA's pixels are BGR aligned
+    glReadPixels(0, 0, window_width_,window_height_, 0x80E0, 
+    GL_UNSIGNED_BYTE, pixels);
+
+    // open the file for writing. If unsucessful, return 1
+    std::string filename = "screenshot.tga";
+
+    shot=fopen(filename.c_str(), "wb");
+
+
+    // this is the tga header it must be in the beginning of 
+    // every (uncompressed) .tga
+    uchar TGAheader[12]={0,0,2,0,0,0,0,0,0,0,0,0};
+    // the header that is used to get the dimensions of the .tga
+    // header[1]*256+header[0] - width
+    // header[3]*256+header[2] - height
+    // header[4] - bits per pixel
+    // header[5] - ?
+    uchar header[6]={((int)(window_width_%256)),
+    ((int)(window_width_/256)),
+    ((int)(window_height_%256)),
+    ((int)(window_height_/256)),24,0};
+
+    // write out the TGA header
+    fwrite(TGAheader, sizeof(uchar), 12, shot);
+    // write out the header
+    fwrite(header, sizeof(uchar), 6, shot);
+    // write the pixels
+    fwrite(pixels, sizeof(uchar), 
+    window_width_*window_height_*3, shot);
+
+    // close the file
+    fclose(shot);
+    // free the memory
+    delete [] pixels;
+
 }

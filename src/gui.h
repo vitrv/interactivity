@@ -51,6 +51,7 @@ public:
 	void initCylinder();
 	void transformCylinder(Bone* child, const glm::vec3& origin, 
 		const glm::vec3& direction);
+	void printToPNG();
 
 	std::vector<glm::vec4> cyl_draw_vertices;
 	std::vector<glm::uvec2> cyl_lines;

@@ -2,8 +2,10 @@
 #include "config.h"
 #include <stdio.h>
 #include <math.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/glm.hpp>
 
-
+bool firstRender = true;
 int bone_index = 0;
 
 void create_floor(std::vector<glm::vec4>& floor_vertices, std::vector<glm::uvec3>& floor_faces)
@@ -183,7 +185,6 @@ void create_skeleton_t(Joint* root, glm::vec3 base_offset,
 void create_skeleton1(Joint* root, std::vector<glm::vec4>& skel_vertices, 
 					 std::vector<glm::uvec2>& skel_lines){
 	skel_vertices.clear();
-	skel_lines.clear();
 	create_skeleton_t1(root, glm::mat4(1.0),skel_vertices, skel_lines);
 }
 
@@ -199,10 +200,43 @@ void create_skeleton_t1(Joint* root, glm::mat4 transform,
 
 		skel_vertices.push_back(startPoint);
         skel_vertices.push_back(endPoint);
-        skel_lines.push_back(glm::uvec2(bone_index++,bone_index++));
+        if(firstRender){
+        	skel_lines.push_back(glm::uvec2(bone_index++,bone_index++));        	
+        }
 
         create_skeleton_t1(temp->end,(transform * temp->transform * temp->disformed), skel_vertices, skel_lines );
 	}
 
 }
+void setFirstrender(){
+	firstRender = false;
+}
 
+double oldX =0;
+double oldY =0;
+
+void dragDisform(Bone* temp, double x, double y){
+	//Calculate left or right
+	double nx = ((x-oldX) > 0) - ((x-oldX) < 0);
+	double ny = ((y-oldY) > 0) - ((y-oldY) < 0);
+	oldX = x;
+	oldY = y;
+	float xangle = 0.01f*nx;
+	float yangle = 0.01f*ny;
+    glm::mat4 rotateX = glm::rotate(glm::mat4(1.0f), xangle, glm::vec3(1.0f, 0.0f, 0.0f));
+    glm::mat4 rotatey = glm::rotate(glm::mat4(1.0f), yangle, glm::vec3(0.0f, 1.0f, 0.0f));
+    printf("nx is:%f ny is:%f\n",nx, ny );
+    if(nx && ny )
+		temp->disformed *= rotateX * rotatey;
+	
+}
+
+void keyDisform(Bone* temp, int x){
+	//Calculate left or right
+	
+	float xangle = 0.01f*x;
+    glm::mat4 rotateX = glm::rotate(glm::mat4(1.0f), xangle, temp->tangentDir);
+
+	temp->disformed *= rotateX;
+	
+}

@@ -80,7 +80,7 @@ void Mesh::loadpmd(const std::string& fn)
             Joint* parent = joint_map.at(joint->parentID);
             
 	    	Bone* bone = new Bone(joint, parent);
-
+	    	skeleton.bone_map.insert(std::make_pair(joint->ID, bone));
 	    	skeleton.bones.push_back(bone);
 	    	parent->children.push_back(bone);
 	    	skeleton.total_bones++;
@@ -93,6 +93,7 @@ void Mesh::loadpmd(const std::string& fn)
 	initialize_matrix1(skeleton.root, glm::mat4(1.0));
 
 }
+
 
 void Mesh::updateAnimation()
 {
