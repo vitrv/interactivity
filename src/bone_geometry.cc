@@ -61,8 +61,9 @@ void Mesh::loadpmd(const std::string& fn)
         skeleton.joints.push_back(joint);
         joint_list.push_back(joint);
         joint_map.insert(std::make_pair(jointID, joint));
-        
+
         jointID+= 1;
+
 
     }
 
@@ -89,10 +90,37 @@ void Mesh::loadpmd(const std::string& fn)
 	    }
 
     }
+
+    check_skel(skeleton.root);
+
 	find_bone_directions(skeleton.bones);
 	// initialize_matrix(skeleton.bones);
 	initialize_matrix1(skeleton.root, glm::mat4(1.0));
 
+
+}
+
+void Mesh::check_skel(Joint* root){
+	check_skel_t(root, 0);
+}
+
+void Mesh::check_skel_t(Joint* root, int depth) {
+	for (std::vector<Bone*>::iterator it = root->children.begin();
+        it != root->children.end(); ++it){
+		
+		Bone* child = *it;
+
+
+        printf("Bone: %d, Parent: %d, Siblings: %d\n", child->end->ID, root->ID, root->children.size());
+
+	}
+	for (std::vector<Bone*>::iterator it = root->children.begin();
+        it != root->children.end(); ++it){
+		
+		Bone* child = *it;
+
+        check_skel_t(child->end, depth + 1);
+	}
 }
 
 

@@ -19,6 +19,8 @@ struct BoundingBox {
 	glm::vec3 max;
 };
 
+
+
 struct Joint {
 	// FIXME: Implement your Joint data structure.
 	// Note: PMD represents weights on joints, but you need weights on
@@ -96,6 +98,8 @@ struct Mesh {
 
 	void loadpmd(const std::string& fn);
 	void updateAnimation();
+	void check_skel(Joint* root);
+	void check_skel_t(Joint* root, int depth);
 	int getNumberOfBones() const 
 	{ 
 		return skeleton.total_bones;

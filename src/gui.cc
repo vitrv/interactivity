@@ -70,7 +70,7 @@ int counter =0;
         	isect = IntersectCylinder(cyl_origin, cyl_dir , kCylinderRadius, length(o), t);
         	if (isect) {
         		transformCylinder(child, cyl_origin, normalize(cyl_dir));
-        		setCurrentBone(child->end->ID);
+        		current_bone_ = child->end->ID;
         		return true;}
 
         	isect = Intersect(child->end, b, t);
@@ -102,8 +102,18 @@ int counter =0;
         	glm::vec3 cyl_origin = glm::vec3(a.x, a.y, a.z);
         	glm::vec4 o = b - a; 
         	glm::vec3 cyl_dir = glm::vec3(o.x, o.y, o.z);
+
+           if (child->end->ID == 107){
+           //printf("Bone id: %d ,length b: %f , b.x: %f, b.y: %f, b.z: %f  \n",child->end->ID, length(child->end->offset), b.x, b.y, b.z );
+           //printf("a.x: %f, a.y: %f, a.z: %f  \n", a.x, a.y, a.z );
+
+
+           }
+
         	isect = IntersectCylinder(cyl_origin, normalize(cyl_dir) , kCylinderRadius, 
         		length(child->end->offset), t);
+
+        	//if(child->end->ID == 0) isect = false;
 
         	if (lock && (child->end->ID == current_bone_)){
         		transformCylinder(child, cyl_origin, normalize(cyl_dir));
@@ -113,17 +123,15 @@ int counter =0;
 
         	if (isect && !lock) {
         		transformCylinder(child, cyl_origin, normalize(cyl_dir));
-        		//printf("Bone id: %d\n", child->end->ID );
-        		setCurrentBone(child->end->ID);
+        		//printf("Bone id: %d, length o: %f\n", child->end->ID, length(b));
+        		current_bone_ = child->end->ID;
         		return true;}
 
         	isect = Intersect_b(child->end, 
         		    transform * child->transform * child->disformed, t, lock);
-
-            if (isect) return true;
-
-
+            if (isect) return true;	
         }
+
 
 		//setCurrentBone(-1);
         return false;
@@ -356,7 +364,6 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
 	}
 
 	// FIXME: highlight bones that have been moused over
-	if (!drag_bone) current_bone_ = -1;
 
 
 	// Get Ray that the mouse is pointing for bone picking
@@ -389,7 +396,11 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
     
 	//bool isect = Intersect(mesh_->skeleton.root, mesh_->skeleton.root->offset, &t);
     bool isect = Intersect_b(mesh_->skeleton.root, glm::mat4(1.0), &t, drag_bone);
-    printf("current_bone %d\n", current_bone_ );
+    if (!isect && !drag_bone) current_bone_ = -1;
+
+    //if (drag_bone) printf("Drag state true, current_bone %d\n", current_bone_ );
+    //else printf("Drag state false, current_bone %d\n", current_bone_ );
+
 }
 
 void GUI::mouseButtonCallback(int button, int action, int mods)

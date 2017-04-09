@@ -30,16 +30,23 @@ void find_bone_directions(std::vector<Bone*> bones){
 		glm::vec3 vH = temp->tangentDir;
 		if(abs(vH.x) < abs(vH.y) && abs(vH.x) < abs(vH.z)){
 			vH.x = 1;
+			vH.y = 0;
+			vH.z = 0;
 		}else if(abs(vH.y) < abs(vH.x) && abs(vH.y) < abs(vH.z)){
 			vH.y = 1;
+			vH.x = 0;
+			vH.z = 0;
 		}else{
 			vH.z = 1;
+			vH.y = 0;
+			vH.x = 0;
 		}
 		vH = cross(temp->tangentDir, vH);
+		if (length(vH) < .00001) vH = glm::vec3(1.0, 0.0, 0.0);
 		temp->normalDir = normalize(vH/length(vH));
 		temp->binormalDir = normalize(cross(temp->tangentDir, temp->normalDir));
 
-
+		//printf("bone: %d , normal: %f, binormal: %f , tangent: %f\n", temp->end->ID, length(temp->normalDir), length(temp->binormalDir), length(temp->tangentDir) );
 
 	}
 }
@@ -127,7 +134,7 @@ void initialize_matrix1 (Joint* root, glm::mat4 baseR){
 
 		}
 
-		initialize_matrix1(temp->end, baseR*temp->rotate);
+		initialize_matrix1(temp->end, baseR * temp->rotate);
 
 
 
