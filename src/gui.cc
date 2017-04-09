@@ -50,6 +50,7 @@ int counter =0;
 		return true;
 	}
 
+
 	bool GUI::Intersect(Joint*& root, glm::vec3& base_offset, float* t) {
         
         bool isect;
@@ -73,6 +74,45 @@ int counter =0;
         		return true;}
 
         	isect = Intersect(child->end, b, t);
+            if (isect) return true;
+
+
+        }
+
+        return false;
+       
+   
+	}
+
+	bool GUI::Intersect_b(Joint*& root, glm::mat4 transform, float* t) {
+        
+        bool isect;
+
+        for (std::vector<Bone*>::iterator it = root->children.begin();
+             it != root->children.end(); it++){
+
+
+    		Bone* child = *it;
+
+        	glm::vec4 a = transform * child->transform * 
+        	              glm::vec4(0.0, 0.0, 0.0, 1.0);
+        	glm::vec4 b = transform * child->transform * child->disformed
+        	             * glm::vec4(0.0, 0.0, length(child->end->offset), 1.0);
+
+        	glm::vec3 cyl_origin = glm::vec3(a.x, a.y, a.z);
+        	glm::vec4 o = b - a; 
+        	glm::vec3 cyl_dir = glm::vec3(o.x, o.y, o.z);
+        	isect = IntersectCylinder(cyl_origin, normalize(cyl_dir) , kCylinderRadius, 
+        		length(child->end->offset), t);
+
+        	if (isect) {
+        		transformCylinder(child, cyl_origin, normalize(cyl_dir));
+        		setCurrentBone(child->end->ID);
+        		return true;}
+
+        	isect = Intersect_b(child->end, 
+        		    transform * child->transform * child->disformed, t);
+
             if (isect) return true;
 
 
@@ -124,6 +164,7 @@ int counter =0;
             binorm_vertices.push_back(glm::vec4(origin + child->binormalDir, 1.0));
 
 		}	
+
 
 	}
 	void GUI::initCylinder(){
@@ -336,8 +377,8 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
     glm::vec3 cyl_origin = glm::vec3(0.0, 0.0, 0.0);
     glm::vec3 cyl_dir = glm::vec3(0.0, 1.0, 0.0);
 
-	bool isect = Intersect(mesh_->skeleton.root, mesh_->skeleton.root->offset, &t);
-
+	//bool isect = Intersect(mesh_->skeleton.root, mesh_->skeleton.root->offset, &t);
+    bool isect = Intersect_b(mesh_->skeleton.root, glm::mat4(1.0), &t);
 }
 
 void GUI::mouseButtonCallback(int button, int action, int mods)
