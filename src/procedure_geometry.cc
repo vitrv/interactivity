@@ -225,7 +225,7 @@ void dragDisform(Bone* temp, double x, double y){
 	float yangle = 0.01f*ny;
     glm::mat4 rotateX = glm::rotate(glm::mat4(1.0f), xangle, glm::vec3(1.0f, 0.0f, 0.0f));
     glm::mat4 rotatey = glm::rotate(glm::mat4(1.0f), yangle, glm::vec3(0.0f, 1.0f, 0.0f));
-    printf("nx is:%f ny is:%f\n",nx, ny );
+    //printf("nx is:%f ny is:%f\n",nx, ny );
     if(nx && ny )
 		temp->disformed *= rotateX * rotatey;
 	

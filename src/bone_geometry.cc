@@ -63,6 +63,7 @@ void Mesh::loadpmd(const std::string& fn)
         joint_map.insert(std::make_pair(jointID, joint));
         
         jointID+= 1;
+
     }
 
     skeleton.total_bones = 0;
