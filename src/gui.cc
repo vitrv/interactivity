@@ -84,7 +84,7 @@ int counter =0;
    
 	}
 
-	bool GUI::Intersect_b(Joint*& root, glm::mat4 transform, float* t) {
+	bool GUI::Intersect_b(Joint*& root, glm::mat4 transform, float* t, bool lock) {
         
         bool isect;
 
@@ -105,13 +105,18 @@ int counter =0;
         	isect = IntersectCylinder(cyl_origin, normalize(cyl_dir) , kCylinderRadius, 
         		length(child->end->offset), t);
 
-        	if (isect) {
+        	if (lock && (child->end->ID == current_bone_)){
+        		transformCylinder(child, cyl_origin, normalize(cyl_dir));
+        		return true;
+        	}
+
+        	if (isect && !lock) {
         		transformCylinder(child, cyl_origin, normalize(cyl_dir));
         		setCurrentBone(child->end->ID);
         		return true;}
 
         	isect = Intersect_b(child->end, 
-        		    transform * child->transform * child->disformed, t);
+        		    transform * child->transform * child->disformed, t, lock);
 
             if (isect) return true;
 
@@ -343,11 +348,11 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
 		// FIXME: Handle bone rotation
 		Bone* temp = mesh_->skeleton.bone_map.at(current_bone_);
 		dragDisform(temp,mouse_x,mouse_y);
-		return ;
+		//return ;
 	}
 
 	// FIXME: highlight bones that have been moused over
-	current_bone_ = -1;
+	//current_bone_ = -1;
 
 
 	// Get Ray that the mouse is pointing for bone picking
@@ -378,7 +383,7 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
     glm::vec3 cyl_dir = glm::vec3(0.0, 1.0, 0.0);
 
 	//bool isect = Intersect(mesh_->skeleton.root, mesh_->skeleton.root->offset, &t);
-    bool isect = Intersect_b(mesh_->skeleton.root, glm::mat4(1.0), &t);
+    bool isect = Intersect_b(mesh_->skeleton.root, glm::mat4(1.0), &t, drag_bone);
 }
 
 void GUI::mouseButtonCallback(int button, int action, int mods)

@@ -47,7 +47,7 @@ public:
 			float radius, float height, float* t);
 
 	bool Intersect(Joint*& root, glm::vec3& base_offset, float* t);
-	bool Intersect_b(Joint*& root, glm::mat4 transform, float* t);
+	bool Intersect_b(Joint*& root, glm::mat4 transform, float* t, bool lock);
 
 	void initCylinder();
 	void transformCylinder(Bone* child, const glm::vec3& origin, 
