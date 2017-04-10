@@ -65,6 +65,8 @@ struct Skeleton {
 	std::vector<Bone*> bones;
 	std::map<int,Bone*> bone_map;
 	std::vector<SparseTuple> tup;
+    std::map<int, std::map<int, float>> weightmap;
+
 	int total_bones;
 
 	~Skeleton(){
@@ -98,6 +100,8 @@ struct Mesh {
 	std::vector<Material> materials;
 	BoundingBox bounds;
 	Skeleton skeleton;
+
+	float getBoneWeight(int jid, int vid);
 
 	void loadpmd(const std::string& fn);
 	void updateAnimation();

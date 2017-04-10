@@ -4,6 +4,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include "bone_geometry.h"
+#include <map>
 
 class LineMesh;
 
@@ -28,7 +29,9 @@ void create_skeleton_t1(Joint* root, glm::mat4 transform,
 	                 std::vector<glm::vec4>& skel_vertices, 
 	                 std::vector<glm::uvec2>& skel_lines);
 
-void setWeights(std::vector<SparseTuple> tup, Joint* root);
+void setWeights(std::vector<SparseTuple> tup,
+                std::map<int, std::map<int, float>>& weightmap,
+                std::vector<Bone*> bones);
 
 void setFirstrender();
 void dragDisform(Bone* temp, double x, double y);

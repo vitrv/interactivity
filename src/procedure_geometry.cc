@@ -258,13 +258,27 @@ void keyDisform(Bone* temp, int x){
 	
 }
 
-
-void setWeights(std::vector<SparseTuple> tup, Joint* root){
+//std::map<int jointID, std::map<int vertID, float weight>> weightmap,
+void setWeights(std::vector<SparseTuple> tup,
+                std::map<int, std::map<int, float>>& weightmap,
+                std::vector<Bone*> bones){
 
 	
     for (std::vector<SparseTuple>::iterator it = tup.begin() ; it != tup.end(); ++it){
 		SparseTuple tuple = *it;
-		printf("The Joint Id is:%d The Vertex Id is:%d The weight is:%f\n",tuple.jid,tuple.vid,tuple.weight);
-    }
 
+		//printf("jid: %d vid: %d w: %f\n", tuple.jid, tuple.vid, tuple.weight );
+		std::map<int, std::map<int, float>>::iterator mapIt = weightmap.find(tuple.jid);
+		if(mapIt != weightmap.end()){
+			weightmap.at(tuple.jid).insert(std::make_pair(tuple.vid, tuple.weight));
+
+		}
+		else{
+			
+			std::map<int, float > temp;
+			temp.insert(std::make_pair(tuple.vid, tuple.weight));
+			weightmap.insert(std::make_pair(tuple.jid, temp));
+
+		}
+    }
 }

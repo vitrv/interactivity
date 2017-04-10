@@ -91,14 +91,20 @@ void Mesh::loadpmd(const std::string& fn)
 
     }
 
-    check_skel(skeleton.root);
+    //check_skel(skeleton.root);
+
 
 	find_bone_directions(skeleton.bones);
 	// initialize_matrix(skeleton.bones);
 	initialize_matrix1(skeleton.root, glm::mat4(1.0));
 
     mr.getJointWeights(skeleton.tup);
-    setWeights(skeleton.tup, skeleton.root);
+    setWeights(skeleton.tup, skeleton.weightmap, skeleton.bones);
+
+
+    //test w/ jid: 1 vid: 6736 w: 0.750000
+    printf("Weight: %f\n",getBoneWeight(1, 6736));
+
 
 }
 
@@ -129,10 +135,20 @@ void Mesh::check_skel_t(Joint* root, int depth) {
 void Mesh::updateAnimation()
 {
 	animated_vertices = vertices;
-	// FIXME: blend the vertices to animated_vertices, rather than copy
-	//        the data directly.
+	//Use ordering of vertices as vertex id
+	//update animated vertex w/ calculation function
+	//Iterate thru joints and sum
 }
 
+float Mesh::getBoneWeight(int jid, int vid){
+
+	if(skeleton.weightmap.find(jid) != skeleton.weightmap.end()){
+    	if(skeleton.weightmap[jid].find(vid) != skeleton.weightmap[jid].end()){
+    	    return skeleton.weightmap[jid][vid];
+    	}
+    	else return -1.0;
+    }else return -1.0;
+}
 
 void Mesh::computeBounds()
 {
