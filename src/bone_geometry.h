@@ -53,6 +53,8 @@ struct Bone {
 	glm::mat4 rotate;
 	// Parent Bone's Inverse Rotation Matrix;
 	glm::mat4 baseR;
+	glm::mat4 transformU;
+	glm::mat4 transformD; 
 
 
 };

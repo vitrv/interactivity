@@ -134,6 +134,7 @@ void initialize_matrix1 (Joint* root, glm::mat4 baseR){
 
 		}
 
+		temp->transformU = baseR * temp->transform * temp->rotate;
 		initialize_matrix1(temp->end, baseR * temp->rotate);
 
 
@@ -205,6 +206,9 @@ void create_skeleton_t1(Joint* root, glm::mat4 transform,
 		glm::vec4 startPoint = transform * temp->transform * glm::vec4(0.0, 0.0, 0.0, 1.0);
 		glm::vec4 endPoint = transform * temp->transform * temp->disformed * glm::vec4(0.0, 0.0, length(temp->end->offset), 1.0);
 
+		temp->transformD = transform * temp->transform;
+
+
 		skel_vertices.push_back(startPoint);
         skel_vertices.push_back(endPoint);
         if(firstRender){
@@ -255,8 +259,9 @@ void keyDisform(Bone* temp, int x){
 }
 
 
-void setWeights(std::vector<SparseTuple> tup){
+void setWeights(std::vector<SparseTuple> tup, Joint* root){
 
+	
     for (std::vector<SparseTuple>::iterator it = tup.begin() ; it != tup.end(); ++it){
 		SparseTuple tuple = *it;
 		printf("The Joint Id is:%d The Vertex Id is:%d The weight is:%f\n",tuple.jid,tuple.vid,tuple.weight);

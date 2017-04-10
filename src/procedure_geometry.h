@@ -28,7 +28,7 @@ void create_skeleton_t1(Joint* root, glm::mat4 transform,
 	                 std::vector<glm::vec4>& skel_vertices, 
 	                 std::vector<glm::uvec2>& skel_lines);
 
-void setWeights(std::vector<SparseTuple> tup);
+void setWeights(std::vector<SparseTuple> tup, Joint* root);
 
 void setFirstrender();
 void dragDisform(Bone* temp, double x, double y);
