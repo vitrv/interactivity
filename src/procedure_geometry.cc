@@ -242,8 +242,24 @@ void keyDisform(Bone* temp, int x){
 	//Calculate left or right
 	
 	float xangle = 0.01f*x;
-    glm::mat4 rotateX = glm::rotate(glm::mat4(1.0f), xangle, temp->tangentDir);
+    glm::mat4 rotateX = glm::rotate(glm::mat4(1.0f), xangle, temp->binormalDir);
+
+    glm::vec4 n = rotateX * glm::vec4(temp->normalDir, 0.0);
+    glm::vec4 b = rotateX * glm::vec4(temp->binormalDir, 0.0);
+
+    temp->normalDir = glm::vec3(n.x, n.y, n.z);
+    temp->binormalDir = glm::vec3(b.x, b.y, b.z);
 
 	temp->disformed *= rotateX;
 	
+}
+
+
+void setWeights(std::vector<SparseTuple> tup){
+
+    for (std::vector<SparseTuple>::iterator it = tup.begin() ; it != tup.end(); ++it){
+		SparseTuple tuple = *it;
+		printf("The Joint Id is:%d The Vertex Id is:%d The weight is:%f\n",tuple.jid,tuple.vid,tuple.weight);
+    }
+
 }

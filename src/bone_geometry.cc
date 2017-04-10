@@ -97,6 +97,8 @@ void Mesh::loadpmd(const std::string& fn)
 	// initialize_matrix(skeleton.bones);
 	initialize_matrix1(skeleton.root, glm::mat4(1.0));
 
+    mr.getJointWeights(skeleton.tup);
+    setWeights(skeleton.tup);
 
 }
 

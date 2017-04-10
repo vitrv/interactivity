@@ -62,6 +62,7 @@ struct Skeleton {
 	std::vector<Joint*> joints;
 	std::vector<Bone*> bones;
 	std::map<int,Bone*> bone_map;
+	std::vector<SparseTuple> tup;
 	int total_bones;
 
 	~Skeleton(){

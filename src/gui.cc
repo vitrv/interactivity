@@ -297,15 +297,17 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 	if (captureWASDUPDOWN(key, action))
 		return ;
 	if (key == GLFW_KEY_LEFT || key == GLFW_KEY_RIGHT) {
-		float roll_speed;
+		float roll_speed = 1;
 		if (key == GLFW_KEY_RIGHT)
-			roll_speed = -roll_speed_;
+			roll_speed = -roll_speed;
 		else
-			roll_speed = roll_speed_;
+			roll_speed = roll_speed;
 		// FIXME: actually roll the bone here
 		if(current_bone_ != -1){
 			Bone* temp = mesh_->skeleton.bone_map.at(current_bone_);
 			keyDisform(temp,roll_speed);
+            float garbage;
+			Intersect_b(mesh_->skeleton.root, glm::mat4(1.0), &garbage, true);;
 		}
 	} else if (key == GLFW_KEY_C && action != GLFW_RELEASE) {
 		fps_mode_ = !fps_mode_;
@@ -320,10 +322,6 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 	} else if (key == GLFW_KEY_T && action != GLFW_RELEASE) {
 		transparent_ = !transparent_;
 	} else if (key == GLFW_KEY_J && action != GLFW_RELEASE) {
-		if(current_bone_ != -1){
-			Bone* temp = mesh_->skeleton.bone_map.at(current_bone_);
-			keyDisform(temp,-1);
-		}
 		GUI::printToPNG();
 	} 
 }
