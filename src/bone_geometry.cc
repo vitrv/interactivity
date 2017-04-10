@@ -103,7 +103,7 @@ void Mesh::loadpmd(const std::string& fn)
 
 
     //test w/ jid: 1 vid: 6736 w: 0.750000
-    printf("Weight: %f\n",getBoneWeight(1, 6736));
+    printf("Weight: %f\n",getBoneWeight(6736, 1));
 
 
 }
@@ -140,11 +140,11 @@ void Mesh::updateAnimation()
 	//Iterate thru joints and sum
 }
 
-float Mesh::getBoneWeight(int jid, int vid){
+float Mesh::getBoneWeight(int vid, int jid){
 
-	if(skeleton.weightmap.find(jid) != skeleton.weightmap.end()){
-    	if(skeleton.weightmap[jid].find(vid) != skeleton.weightmap[jid].end()){
-    	    return skeleton.weightmap[jid][vid];
+	if(skeleton.weightmap.find(vid) != skeleton.weightmap.end()){
+    	if(skeleton.weightmap[vid].find(jid) != skeleton.weightmap[vid].end()){
+    	    return skeleton.weightmap[vid][jid];
     	}
     	else return -1.0;
     }else return -1.0;

@@ -268,16 +268,16 @@ void setWeights(std::vector<SparseTuple> tup,
 		SparseTuple tuple = *it;
 
 		//printf("jid: %d vid: %d w: %f\n", tuple.jid, tuple.vid, tuple.weight );
-		std::map<int, std::map<int, float>>::iterator mapIt = weightmap.find(tuple.jid);
+		std::map<int, std::map<int, float>>::iterator mapIt = weightmap.find(tuple.vid);
 		if(mapIt != weightmap.end()){
-			weightmap.at(tuple.jid).insert(std::make_pair(tuple.vid, tuple.weight));
+			weightmap.at(tuple.vid).insert(std::make_pair(tuple.jid, tuple.weight));
 
 		}
 		else{
 			
 			std::map<int, float > temp;
-			temp.insert(std::make_pair(tuple.vid, tuple.weight));
-			weightmap.insert(std::make_pair(tuple.jid, temp));
+			temp.insert(std::make_pair(tuple.jid, tuple.weight));
+			weightmap.insert(std::make_pair(tuple.vid, temp));
 
 		}
     }
